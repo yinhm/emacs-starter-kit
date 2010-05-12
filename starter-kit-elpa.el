@@ -10,7 +10,12 @@
                                    'css-mode
                                    'yaml-mode
                                    'magit
-                                   'gist)
+                                   'rinari
+                                   'rspec-mode
+                                   'textmate
+                                   'yasnippet-bundle
+                                   'ruby-test-mode
+                                   'eproject)
   "Libraries that should be installed by default.")
 
 (defun starter-kit-elpa-install ()

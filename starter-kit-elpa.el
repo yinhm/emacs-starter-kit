@@ -11,10 +11,8 @@
                                    'yaml-mode
                                    'magit
                                    'rinari
-                                   'rspec-mode
                                    'textmate
                                    'yasnippet-bundle
-                                   'ruby-test-mode
                                    'eproject)
   "Libraries that should be installed by default.")
 

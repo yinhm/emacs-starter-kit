@@ -17,7 +17,9 @@
 (define-key ac-completing-map "\C-p" 'ac-previous)
 
 ;; start completion when 3 characters have been entered
-(setq ac-auto-start 3)
+;; (setq ac-auto-start 3)
+;; never auto start
+(setq ac-auto-start nil)
 
 ;; use tab to trigger auto-complete
 (ac-set-trigger-key "TAB")
@@ -32,3 +34,10 @@
           (lambda ()
             (add-to-list 'ac-sources 'ac-source-rsense-method)
             (add-to-list 'ac-sources 'ac-source-rsense-constant)))
+
+;; stop completion automatically after "do", "end"
+(add-hook 'ruby-mode-hook
+          (lambda ()
+            (make-local-variable 'ac-ignores)
+            (add-to-list 'ac-ignores "end")
+            (add-to-list 'ac-ignores "do")))

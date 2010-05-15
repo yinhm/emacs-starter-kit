@@ -20,3 +20,22 @@
 
 ;; ruby test mode
 (require 'ruby-test-mode)
+
+;; auto complete
+;; Complete by C-c .
+(add-hook 'ruby-mode-hook
+          (lambda ()
+            (local-set-key (kbd "C-c .") 'ac-complete-rsense)))
+
+;; If you want to start completion automatically after inserting . and ::,
+(add-hook 'ruby-mode-hook
+          (lambda ()
+            (add-to-list 'ac-sources 'ac-source-rsense)
+            (add-to-list 'ac-sources 'ac-source-yasnippet)))
+
+;; stop completion automatically after "do", "end"
+(add-hook 'ruby-mode-hook
+          (lambda ()
+            (make-local-variable 'ac-ignores)
+            (add-to-list 'ac-ignores "end")
+            (add-to-list 'ac-ignores "do")))

@@ -12,6 +12,8 @@
 (require 'auto-complete-config)
 (global-auto-complete-mode t)
 
+(setq ac-dictionary-directories (concat dotfiles-dir "/vendor/auto-complete/dict"))
+
 ;; use C-n/C-p to select candidates
 (define-key ac-completing-map "\C-n" 'ac-next)
 (define-key ac-completing-map "\C-p" 'ac-previous)
@@ -24,20 +26,3 @@
 ;; use tab to trigger auto-complete
 (ac-set-trigger-key "TAB")
 
-;; Complete by C-c .
-(add-hook 'ruby-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c .") 'ac-complete-rsense)))
-
-;; If you want to start completion automatically after inserting . and ::,
-(add-hook 'ruby-mode-hook
-          (lambda ()
-            (add-to-list 'ac-sources 'ac-source-rsense-method)
-            (add-to-list 'ac-sources 'ac-source-rsense-constant)))
-
-;; stop completion automatically after "do", "end"
-(add-hook 'ruby-mode-hook
-          (lambda ()
-            (make-local-variable 'ac-ignores)
-            (add-to-list 'ac-ignores "end")
-            (add-to-list 'ac-ignores "do")))

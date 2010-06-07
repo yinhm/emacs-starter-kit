@@ -26,3 +26,8 @@
 (setq make-backup-files nil)
 
 (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
+
+;; ispell dict
+(ispell-change-dictionary "en_US" t)
+(setq-default ispell-program-name "aspell")
+

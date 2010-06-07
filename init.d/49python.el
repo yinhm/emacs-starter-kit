@@ -19,19 +19,19 @@
 (add-to-list 'interpreter-mode-alist '("python" . python-mode))
 (setq interpreter-mode-alist
       (cons '("python" . python-mode)
-interpreter-mode-alist)
+            interpreter-mode-alist)
       python-mode-hook
       '(lambda () (progn
-(set-variable 'py-indent-offset 4)
-(set-variable 'py-smart-indentation nil)
-(set-variable 'indent-tabs-mode nil)
-;;(highlight-beyond-fill-column)
-                    (define-key python-mode-map "\C-m" 'newline-and-indent)
-;(pabbrev-mode)
-;(abbrev-mode)
-)
+                (set-variable 'py-indent-offset 4)
+                (set-variable 'py-smart-indentation nil)
+                (set-variable 'indent-tabs-mode nil)
+                ;;(highlight-beyond-fill-column)
+                (define-key python-mode-map "\C-m" 'newline-and-indent)
+                                        ;(pabbrev-mode)
+                                        ;(abbrev-mode)
+                )
+         )
       )
-)
 
 ;; Autofill inside of comments
 
@@ -54,6 +54,8 @@ interpreter-mode-alist)
 ;; '(add-to-list 'pymacs-load-path YOUR-PYMACS-DIRECTORY"))
 (pymacs-load "ropemacs" "rope-")
 (setq ropemacs-enable-autoimport t)
+;;(setq ropemacs-guess-project t)
+(rope-open-project "~/.pymacs")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Auto-completion
@@ -119,10 +121,20 @@ interpreter-mode-alist)
   ; 4) If the char after point is not alpha-numerical, try autocomplete
   ; 5) Try to do a regular python indent.
   ; 6) If at the end of a word, try autocomplete.
-(define-key python-mode-map "\t" 'yas/expand)
+;; (add-hook 'python-mode-hook
+;;           '(lambda ()
+;;              (setq yas/fallback-behavior
+;;                    `(apply ,ryan-python-expand-after-yasnippet))
+;;              (local-set-key [tab] 'yas/expand)))
+
+(define-key python-mode-map [tab] 'ryan-python-expand-after-yasnippet)
 (add-hook 'python-mode-hook
-          (lambda ()
-            (set (make-local-variable 'yas/trigger-fallback) 'ryan-python-expand-after-yasnippet)))
+          (let ((original-command (lookup-key python-mode-map [tab])))
+            `(lambda ()
+               (setq yas/fallback-behavior
+                     '(apply ,original-command))
+               (local-set-key [tab] 'yas/expand))))
+
 (defun ryan-indent ()
   "Runs indent-for-tab-command but returns t if it actually did an indent; nil otherwise"
   (let ((prev-point (point)))

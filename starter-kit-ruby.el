@@ -33,12 +33,12 @@
   (pcomplete-here (pcmpl-rake-tasks)))
 
 (defun pcmpl-rake-tasks ()
-   "Return a list of all the rake tasks defined in the current
+  "Return a list of all the rake tasks defined in the current
 projects.  I know this is a hack to put all the logic in the
 exec-to-string command, but it works and seems fast"
-   (delq nil (mapcar '(lambda(line)
-			(if (string-match "rake \\([^ ]+\\)" line) (match-string 1 line)))
-		     (split-string (shell-command-to-string "rake -T") "[\n]"))))
+  (delq nil (mapcar '(lambda(line)
+                       (if (string-match "rake \\([^ ]+\\)" line) (match-string 1 line)))
+                    (split-string (shell-command-to-string "rake -T") "[\n]"))))
 
 (defun rake (task)
   (interactive (list (completing-read "Rake (default: default): "
@@ -60,36 +60,43 @@ exec-to-string command, but it works and seems fast"
 
 ;;; Flymake
 
+(defun flymake-ruby-init ()
+  (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                     'flymake-create-temp-inplace))
+         (local-file (file-relative-name
+                      temp-file
+                      (file-name-directory buffer-file-name))))
+    ;; Invoke ruby with '-c' to get syntax checking
+    (list "ruby" (list "-c" local-file))))
+
+(defun flymake-ruby-enable ()
+  (when (and buffer-file-name
+             (file-writable-p
+              (file-name-directory buffer-file-name))
+             (file-writable-p buffer-file-name)
+             (if (fboundp 'tramp-list-remote-buffers)
+                 (not (subsetp
+                       (list (current-buffer))
+                       (tramp-list-remote-buffers)))
+               t))
+    (local-set-key (kbd "C-c d")
+                   'flymake-display-err-menu-for-current-line)
+    (flymake-mode t)))
+
 (eval-after-load 'ruby-mode
   '(progn
      (require 'flymake)
-
-     (defvar flymake-ruby-err-line-patterns '(("^\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 1 2 nil 3)))
-     (defvar flymake-ruby-allowed-file-name-masks '((".+\\.\\(rb\\|rake\\)$" flymake-ruby-init)
-                                                    ("Rakefile$" flymake-ruby-init)))
-
-     ;; Not provided by flymake itself, curiously
-     (defun flymake-create-temp-in-system-tempdir (filename prefix)
-       (make-temp-file (or prefix "flymake-ruby")))
-
-     ;; Invoke ruby with '-c' to get syntax checking
-     (defun flymake-ruby-init ()
-       (list "ruby" (list "-c" (flymake-init-create-temp-buffer-copy
-                                'flymake-create-temp-in-system-tempdir))))
-
-     (defun flymake-ruby-load ()
-       (interactive)
-       (set (make-local-variable 'flymake-allowed-file-name-masks) flymake-ruby-allowed-file-name-masks)
-       (set (make-local-variable 'flymake-err-line-patterns) flymake-ruby-err-line-patterns)
-       (flymake-mode t)) 
-
-     (add-hook 'ruby-mode-hook 'flymake-ruby-load)
-     ))
+     
+     (push '(".+\\.rb$" flymake-ruby-init) flymake-allowed-file-name-masks)
+     (push '("Rakefile$" flymake-ruby-init) flymake-allowed-file-name-masks)
+     (push '("^\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 1 2 nil 3)
+           flymake-err-line-patterns)
+     (add-hook 'ruby-mode-hook 'flymake-ruby-enable)))
 
 ;; Rinari (Minor Mode for Ruby On Rails)
 (setq rinari-major-modes
       (list 'mumamo-after-change-major-mode-hook 'dired-mode-hook 'ruby-mode-hook
-	    'css-mode-hook 'yaml-mode-hook 'javascript-mode-hook))
+            'css-mode-hook 'yaml-mode-hook 'javascript-mode-hook))
 
 ;; TODO: set up ri
 ;; TODO: electric

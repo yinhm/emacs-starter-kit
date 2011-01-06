@@ -21,6 +21,14 @@
 ;; ruby test mode
 (require 'ruby-test-mode)
 
+;; rspec default ouput with ansi color, make compilation work with it.
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region (point-min) (point-max))
+  (toggle-read-only))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
 ;; auto complete
 ;; Complete by C-c .
 (add-hook 'ruby-mode-hook

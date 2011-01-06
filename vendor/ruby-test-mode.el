@@ -80,7 +80,7 @@ Test Driven Development in Ruby."
   :group 'ruby-test)
 
 (defcustom ruby-test-rspec-executables
-  '("/opt/local/bin/spec" "spec" "/usr/bin/spec" "/usr/local/bin/spec")
+  '("/opt/local/bin/spec" "rspec" "/usr/bin/spec" "/usr/local/bin/spec")
   "*A list of spec executables. If the spec does not belong to a
   rails project, then non-absolute paths get expanded using
   `PATH'; The first existing will get picked. In a rails project

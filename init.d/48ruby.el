@@ -1,7 +1,7 @@
 ;; ruby + rinari
 
-(setq exec-path (cons "/var/lib/gems/1.8/bin" exec-path))
-(setenv "PATH" (concat "/var/lib/gems/1.8/bin:" (getenv "PATH")))
+(setq exec-path (cons "/var/lib/gems/1.9.1/bin" exec-path))
+(setenv "PATH" (concat "/var/lib/gems/1.9.1/bin:" (getenv "PATH")))
 
 (add-hook 'ruby-mode-hook
           (lambda ()

@@ -39,7 +39,10 @@
             flymake-err-line-patterns))
 
 (add-hook 'espresso-mode-hook
- 	  (lambda () (flymake-mode t)))
+ 	  (lambda ()
+            (local-set-key (kbd "C-c d")
+                           'flymake-display-err-menu-for-current-line)
+            (flymake-mode t)))
 
 ;; If you prefer js2-mode, use this instead:
 ;; (add-to-list 'auto-mode-alist '("\\.js$" . javascript-mode))

@@ -10,13 +10,9 @@
 (add-hook 'espresso-mode-hook 'run-coding-hook)
 (setq espresso-indent-level 2)
 
-;; Run jslint on a file to check syntax and coding conventions.
-(add-hook 'espresso-mode-hook
-          (lambda ()
-            (set (make-local-variable 'compile-command)
-                 (let ((file (file-name-nondirectory buffer-file-name)))
-                   (concat "node /usr/local/lib/node/jslint/bin/jslint.js " file)))))
 
+;;; Node.js must installed in your system
+;;; change /usr/local of jslint path to your path.
 (require 'flymake)
 (defun flymake-jslint-init ()
   (let* ((temp-file (flymake-init-create-temp-buffer-copy

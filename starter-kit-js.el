@@ -13,7 +13,6 @@
 
 ;;; Node.js must installed in your system
 ;;; change /usr/local of jslint path to your path.
-(require 'flymake)
 (defun flymake-jslint-init ()
   (let* ((temp-file (flymake-init-create-temp-buffer-copy
 		     'flymake-create-temp-inplace))
@@ -22,23 +21,30 @@
 		      (file-name-directory buffer-file-name))))
     (list "node" (list (expand-file-name "/usr/local/lib/node/jslint/bin/jslint.js") local-file))))
 
-(setq flymake-allowed-file-name-masks
-      (cons '(".+\\.js$"
-	      flymake-jslint-init
-	      flymake-simple-cleanup
-	      flymake-get-real-file-name)
-	    flymake-allowed-file-name-masks))
+(defun flymake-espresso-enable ()
+  (when (and buffer-file-name
+             (file-writable-p
+              (file-name-directory buffer-file-name))
+             (file-writable-p buffer-file-name)
+             (if (fboundp 'tramp-list-remote-buffers)
+                 (not (subsetp
+                       (list (current-buffer))
+                       (tramp-list-remote-buffers)))
+               t))
+    (local-set-key (kbd "C-c d")
+                   'flymake-display-err-menu-for-current-line)
+    (flymake-mode t)))
 
-(setq flymake-err-line-patterns
-      (cons '("^\\(.+\\)\\([[:digit:]]+\\) \\([[:digit:]]+\\),\\([[:digit:]]+\\): \\(.+\\)$"
+(eval-after-load 'espresso-mode
+  '(progn
+     (require 'flymake)
+     
+     (push '(".+\\.js$" flymake-jslint-init) flymake-allowed-file-name-masks)
+     (push '("^\\(.+\\)\\([[:digit:]]+\\) \\([[:digit:]]+\\),\\([[:digit:]]+\\): \\(.+\\)$"
               nil 3 4 5)
-            flymake-err-line-patterns))
+           flymake-err-line-patterns)
+     (add-hook 'espresso-mode-hook 'flymake-espresso-enable)))
 
-(add-hook 'espresso-mode-hook
- 	  (lambda ()
-            (local-set-key (kbd "C-c d")
-                           'flymake-display-err-menu-for-current-line)
-            (flymake-mode t)))
 
 ;; If you prefer js2-mode, use this instead:
 ;; (add-to-list 'auto-mode-alist '("\\.js$" . javascript-mode))

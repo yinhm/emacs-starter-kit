@@ -10,6 +10,13 @@
 (add-hook 'espresso-mode-hook 'run-coding-hook)
 (setq espresso-indent-level 2)
 
+;; Run jslint on a file to check syntax and coding conventions.
+(add-hook 'espresso-mode-hook
+          (lambda ()
+            (set (make-local-variable 'compile-command)
+                 (let ((file (file-name-nondirectory buffer-file-name)))
+                   (concat "node /usr/local/lib/node/jslint/bin/jslint.js " file)))))
+
 
 ;;; Node.js must installed in your system
 ;;; change /usr/local of jslint path to your path.
@@ -22,6 +29,10 @@
     (list "node" (list (expand-file-name "/usr/local/lib/node/jslint/bin/jslint.js") local-file))))
 
 (defun flymake-espresso-enable ()
+  (push '(".+\\.js$" flymake-jslint-init) flymake-allowed-file-name-masks)
+  (push '("^\\(.+\\)\\([[:digit:]]+\\) \\([[:digit:]]+\\),\\([[:digit:]]+\\): \\(.+\\)$"
+          nil 3 4 5)
+        flymake-err-line-patterns)
   (when (and buffer-file-name
              (file-writable-p
               (file-name-directory buffer-file-name))
@@ -35,15 +46,8 @@
                    'flymake-display-err-menu-for-current-line)
     (flymake-mode t)))
 
-(eval-after-load 'espresso-mode
-  '(progn
-     (require 'flymake)
-     
-     (push '(".+\\.js$" flymake-jslint-init) flymake-allowed-file-name-masks)
-     (push '("^\\(.+\\)\\([[:digit:]]+\\) \\([[:digit:]]+\\),\\([[:digit:]]+\\): \\(.+\\)$"
-              nil 3 4 5)
-           flymake-err-line-patterns)
-     (add-hook 'espresso-mode-hook 'flymake-espresso-enable)))
+(require 'flymake)
+(add-hook 'espresso-mode-hook 'flymake-espresso-enable)
 
 
 ;; If you prefer js2-mode, use this instead:

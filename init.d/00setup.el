@@ -28,6 +28,8 @@
 (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 
 ;; ispell dict
+;; With emacs23.1 in ubuntu 10.10, you need to upgrade dictionaries-common to
+;; 1.5.12 at least. See debbug # #591925
 (ispell-change-dictionary "en_US" t)
 (setq-default ispell-program-name "aspell")
 

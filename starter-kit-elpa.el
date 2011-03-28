@@ -10,7 +10,6 @@
                                    'css-mode
                                    'find-file-in-project
                                    'magit
-                                   'rinari
                                    'textmate
                                    'yasnippet-bundle
                                    'eproject)

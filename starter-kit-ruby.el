@@ -94,6 +94,7 @@ exec-to-string command, but it works and seems fast"
      (add-hook 'ruby-mode-hook 'flymake-ruby-enable)))
 
 ;; Rinari (Minor Mode for Ruby On Rails)
+(require 'rinari)
 (setq rinari-major-modes
       (list 'mumamo-after-change-major-mode-hook 'dired-mode-hook 'ruby-mode-hook
             'css-mode-hook 'yaml-mode-hook 'javascript-mode-hook))

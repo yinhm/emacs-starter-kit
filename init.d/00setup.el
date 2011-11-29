@@ -32,4 +32,3 @@
 ;; 1.5.12 at least. See debbug # #591925
 (ispell-change-dictionary "en_US" t)
 (setq-default ispell-program-name "aspell")
-

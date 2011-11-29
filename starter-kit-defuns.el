@@ -16,7 +16,7 @@
     (rename-buffer url t)
     ;; TODO: switch to nxml/nxhtml mode
     (cond ((search-forward "<?xml" nil t) (xml-mode))
-          ((search-forward "<html" nil t) (html-mode)))))
+          ((search-forward "<html" nil t) (xhtml-mode)))))
 
 ;; Buffer-related
 

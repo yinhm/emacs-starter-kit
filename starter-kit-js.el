@@ -43,43 +43,5 @@
   (esk-configure-javascript "js"))
 
 
-;; Run jslint on a file to check syntax and coding conventions.
-(add-hook 'esk-js-mode-hook
-          (lambda ()
-            (set (make-local-variable 'compile-command)
-                 (let ((file (file-name-nondirectory buffer-file-name)))
-                   (concat "node /usr/local/lib/node/jslint/bin/jslint.js " file)))))
-
-;;; Node.js must installed in your system
-;;; change /usr/local of jslint path to your path.
-(defun flymake-jslint-init ()
-  (let* ((temp-file (flymake-init-create-temp-buffer-copy
-		     'flymake-create-temp-inplace))
-         (local-file (file-relative-name
-		      temp-file
-		      (file-name-directory buffer-file-name))))
-    (list "node" (list (expand-file-name "/usr/local/lib/node/jslint/bin/jslint.js") local-file))))
-
-(defun flymake-jsmode-enable ()
-  (push '(".+\\.js$" flymake-jslint-init) flymake-allowed-file-name-masks)
-  (push '("^\\(.+\\)\\([[:digit:]]+\\) \\([[:digit:]]+\\),\\([[:digit:]]+\\): \\(.+\\)$"
-          nil 3 4 5)
-        flymake-err-line-patterns)
-  (when (and buffer-file-name
-             (file-writable-p
-              (file-name-directory buffer-file-name))
-             (file-writable-p buffer-file-name)
-             (if (fboundp 'tramp-list-remote-buffers)
-                 (not (subsetp
-                       (list (current-buffer))
-                       (tramp-list-remote-buffers)))
-               t))
-    (local-set-key (kbd "C-c d")
-                   'flymake-display-err-menu-for-current-line)
-    (flymake-mode t)))
-
-(require 'flymake)
-(add-hook 'esk-js-mode-hook 'flymake-jsmode-enable)
-
 (provide 'starter-kit-js)
 ;;; starter-kit-js.el ends here

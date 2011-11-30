@@ -15,7 +15,7 @@
          (local-file (file-relative-name
 		      temp-file
 		      (file-name-directory buffer-file-name))))
-    (list "jslint" (list local-file))))
+    (list "jslint-emacs" (list local-file))))
 
 (defun flymake-jslint-enable ()
   (push '(".+\\.js$" flymake-jslint-init) flymake-allowed-file-name-masks)

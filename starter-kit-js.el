@@ -20,15 +20,16 @@
        (add-to-list 'auto-mode-alist '("\\.js$" . ,mode))
        (add-to-list 'auto-mode-alist '("\\.json$" . ,mode))
        (add-hook ',hook 'moz-minor-mode)
-       (add-hook ',hook 'esk-paredit-nonlisp)
+       ;; (add-hook ',hook 'esk-paredit-nonlisp)
        (add-hook ',hook 'run-coding-hook)
        (add-hook ',hook 'run-esk-js-mode-hook)
        (setq ,indent 2)
 
-       (eval-after-load ',sym
-         '(progn (define-key ,keymap "{" 'paredit-open-curly)
-                 (define-key ,keymap "}" 'paredit-close-curly-and-newline)
-                 (define-key ,keymap (kbd ",") 'self-insert-command))))))
+       ;;(eval-after-load ',sym
+       ;;  '(progn (define-key ,keymap "{" 'paredit-open-curly)
+       ;;          (define-key ,keymap "}" 'paredit-close-curly-and-newline)
+       ;;          (define-key ,keymap (kbd ",") 'self-insert-command)))
+       )))
 
 (defun pretty-functions ()
   (font-lock-add-keywords

@@ -1,21 +1,27 @@
 (require 'flymake)
+(require 'js-beautify)
 
 ;; Run jslint on a file to check syntax and coding conventions.
 (add-hook 'esk-js-mode-hook
           (lambda ()
             (set (make-local-variable 'compile-command)
                  (let ((file (file-name-nondirectory buffer-file-name)))
-                   (concat "jslint " file)))))
+                   (concat "jslint --indent=2 " file)))))
 
 ;;; Node.js must installed in your system
 ;;; change /usr/local of jslint path to your path.
+
+(defcustom flymake-jslint-arguments
+  (list "--indent=2")
+  "JSLint arguments to invoke syntax checking.")
+
 (defun flymake-jslint-init ()
   (let* ((temp-file (flymake-init-create-temp-buffer-copy
 		     'flymake-create-temp-inplace))
          (local-file (file-relative-name
 		      temp-file
 		      (file-name-directory buffer-file-name))))
-    (list "jslint-emacs" (list local-file))))
+    (list "jslint-emacs" (append flymake-jslint-arguments (list local-file)))))
 
 (defun flymake-jslint-enable ()
   (push '(".+\\.js$" flymake-jslint-init) flymake-allowed-file-name-masks)

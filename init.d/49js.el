@@ -41,6 +41,34 @@
                    'flymake-display-err-menu-for-current-line)
     (flymake-mode t)))
 
+;; (defun flymake-jslint-init ()
+;;   (let* ((temp-file (flymake-init-create-temp-buffer-copy
+;; 		     'flymake-create-temp-inplace))
+;;          (local-file (file-relative-name
+;; 		      temp-file
+;; 		      (file-name-directory buffer-file-name))))
+;;     (list "gjslint" (list local-file))))
+
+;; (defun flymake-jslint-enable ()
+;;   (push '(".+\\.js$" flymake-jslint-init) flymake-allowed-file-name-masks)
+;;   ;; Line 32, E:0212: Parameter mismatch: got "eid", expected "Tab"
+
+;;   (push '("^Line \\([[:digit:]]+\\) E:\\([[:digit:]]+\\): \\(.+\\)"
+;;           nil 1 nil 3)
+;;         flymake-err-line-patterns)
+;;   (when (and buffer-file-name
+;;              (file-writable-p
+;;               (file-name-directory buffer-file-name))
+;;              (file-writable-p buffer-file-name)
+;;              (if (fboundp 'tramp-list-remote-buffers)
+;;                  (not (subsetp
+;;                        (list (current-buffer))
+;;                        (tramp-list-remote-buffers)))
+;;                t))
+;;     (local-set-key (kbd "C-c d")
+;;                    'flymake-display-err-menu-for-current-line)
+;;     (flymake-mode t)))
+
 (add-hook 'esk-js-mode-hook 'flymake-jslint-enable)
 
 

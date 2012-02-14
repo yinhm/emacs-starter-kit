@@ -5,7 +5,7 @@
 ;; (tabbar-mode)
 
 ;; auto fill
-(setq default-fill-column 79)
+(setq fill-column 79)
 (setq-default auto-fill-function 'do-auto-fill)
 
 ;; color theme

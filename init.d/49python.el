@@ -33,6 +33,10 @@
          )
       )
 
+
+;; Cython support
+(require 'cython-mode)
+
 ;; Autofill inside of comments
 
 (defun python-auto-fill-comments-only ()

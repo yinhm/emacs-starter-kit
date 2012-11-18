@@ -31,14 +31,14 @@
 
 ;; auto complete
 ;; Complete by C-c .
-(add-hook 'ruby-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c .") 'ac-complete-rsense)))
+;;(add-hook 'ruby-mode-hook
+;;          (lambda ()
+;;            (local-set-key (kbd "C-c .") 'ac-complete-rsense)))
 
 ;; If you want to start completion automatically after inserting . and ::,
 (add-hook 'ruby-mode-hook
           (lambda ()
-            (add-to-list 'ac-sources 'ac-source-rsense)
+            ;;(add-to-list 'ac-sources 'ac-source-rsense)
             (add-to-list 'ac-sources 'ac-source-yasnippet)))
 
 ;; stop completion automatically after "do", "end"

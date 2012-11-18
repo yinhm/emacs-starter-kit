@@ -25,10 +25,23 @@
 (require 'align)
 (setq make-backup-files nil)
 
-(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
+;;(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
+
+;; MacOS X specific
+;; key bindings
+(when (eq system-type 'darwin) ;; mac specific settings
+  (setq mac-option-modifier 'alt)
+  (setq mac-command-modifier 'meta)
+  (global-set-key [kp-delete] 'delete-char) ;; sets fn-delete to be right-delete
+  )
+
+;; Macports execute path
+;;(add-to-list 'exec-path "/opt/local/bin")
+(setq exec-path (cons "/opt/local/bin" exec-path))
+(setenv "PATH" (concat "/opt/local/bin:" (getenv "PATH")))
+
 
 ;; ispell dict
-;; With emacs23.1 in ubuntu 10.10, you need to upgrade dictionaries-common to
-;; 1.5.12 at least. See debbug # #591925
-(ispell-change-dictionary "en_US" t)
+;; port install aspell first
 (setq-default ispell-program-name "aspell")
+(ispell-change-dictionary "english" t)

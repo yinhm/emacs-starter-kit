@@ -46,10 +46,28 @@
 
 
 ;; pymacs
+(setq py-load-pymacs-p nil)
 (require 'pymacs)
 
+
 (defun setup-ropemacs ()
-  "Setup the ropemacs"
+  "Setup the ropemacs harness"
+  (message "****************************")
+  (if (and (getenv "PYTHONPATH") (not (string= (getenv "PYTHONPATH") "")))
+      (message "true")
+    (message "false"))
+  (message "****************************")
+  ;; If PYTHONPATH is set and not an empty string
+  (if (and (getenv "PYTHONPATH") (not (string= (getenv "PYTHONPATH") "")))
+      ;; append at the end with separator
+      (setenv "PYTHONPATH"
+	      (concat
+	       (getenv "PYTHONPATH") path-separator
+	       (concat dotfiles-dir "python-libs/")))
+    ;; else set it without separator
+    (setenv "PYTHONPATH"
+	    (concat dotfiles-dir "python-libs/"))
+    )
   
   (pymacs-load "ropemacs" "rope-")
   

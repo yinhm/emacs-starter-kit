@@ -11,7 +11,6 @@
                                    'find-file-in-project
                                    'magit
                                    'textmate
-                                   'yasnippet-bundle
                                    'eproject)
   "Libraries that should be installed by default.")
 

@@ -25,3 +25,4 @@ ac-comphist.dat
 eproject.lst
 tutorial/*
 history
+*pyc

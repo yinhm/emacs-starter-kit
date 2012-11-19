@@ -1,22 +1,16 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Python mode customizations
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Python mode
+;; https://launchpad.net/python-mode/
 
-;There are TWO python modes
-; 1) Tim Peter's python-mode.el -- this is the standard/legacy way
-; 2) Dave Love's python.el -- this is when Dave Love got frustrated
-; that python-mode wasn't accepting his patches
-;
-;The following directory has a .nosearch file in it therefore it not in
-;the current load-path and the default python-mode will be used instead
-;The following loads Dave Love's python mode:
 
-;; (add-to-list 'load-path "~/.emacs.d/dave-loves-python-mode")
-(load-library "python")
+(setq py-install-directory (concat dotfiles-dir "/vendor/python-mode"))
+(add-to-list 'load-path py-install-directory)
 
 (autoload 'python-mode "python-mode" "Python Mode." t)
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-(add-to-list 'interpreter-mode-alist '("python" . python-mode))
+
+
+(setq py-shell-name "ipython")
+
+
 (setq interpreter-mode-alist
       (cons '("python" . python-mode)
             interpreter-mode-alist)
@@ -26,9 +20,7 @@
                 (set-variable 'py-smart-indentation nil)
                 (set-variable 'indent-tabs-mode nil)
                 ;;(highlight-beyond-fill-column)
-                (define-key python-mode-map "\C-m" 'newline-and-indent)
-                                        ;(pabbrev-mode)
-                                        ;(abbrev-mode)
+                (define-key python-mode-map "\C-o" 'newline-and-indent)
                 )
          )
       )
@@ -36,9 +28,12 @@
 
 ;; Cython support
 (require 'cython-mode)
+(add-to-list 'auto-mode-alist '("\\.pyx\\'" . cython-mode))
+(add-to-list 'auto-mode-alist '("\\.pxd\\'" . cython-mode))
+(add-to-list 'auto-mode-alist '("\\.pxi\\'" . cython-mode))
+
 
 ;; Autofill inside of comments
-
 (defun python-auto-fill-comments-only ()
   (auto-fill-mode 1)
   (set (make-local-variable 'fill-nobreak-predicate)
@@ -48,206 +43,243 @@
           (lambda ()
             (python-auto-fill-comments-only)))
 
+
+
 ;; pymacs
-(autoload 'pymacs-apply "pymacs")
-(autoload 'pymacs-call "pymacs")
-(autoload 'pymacs-eval "pymacs" nil t)
-(autoload 'pymacs-exec "pymacs" nil t)
-(autoload 'pymacs-load "pymacs" nil t)
-;;(eval-after-load "pymacs"
-;; '(add-to-list 'pymacs-load-path YOUR-PYMACS-DIRECTORY"))
-(pymacs-load "ropemacs" "rope-")
-(setq ropemacs-enable-autoimport t)
-;;(setq ropemacs-guess-project t)
-(rope-open-project "~/.pymacs")
+(require 'pymacs)
 
-;; copy from https://github.com/gabrielelanaro/emacs-for-python/blob/master/epy-python.el
-;; ;; Adding hook to automatically open a rope project if there is one
-;; ;; in the current or in the upper level directory
-;; (add-hook 'python-mode-hook
-;;           (lambda ()
-;;             (cond ((file-exists-p ".ropeproject")
-;;                    (rope-open-project default-directory))
-;;                   ((file-exists-p "../.ropeproject")
-;;                    (rope-open-project (concat default-directory "..")))
-;;                   )))
-;; )
+(defun setup-ropemacs ()
+  "Setup the ropemacs"
+  
+  (pymacs-load "ropemacs" "rope-")
+  
+  ;; Stops from erroring if there's a syntax err
+  (setq ropemacs-codeassist-maxfixes 3)
+
+  ;; Configurations
+  ;;(setq ropemacs-guess-project t)
+  (setq ropemacs-enable-autoimport t)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Auto-completion
-;;; Integrates:
-;;; 1) Rope
-;;; 2) Yasnippet
-;;; all with AutoComplete.el
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun prefix-list-elements (list prefix)
-  (let (value)
-    (nreverse
-     (dolist (element list value)
-      (setq value (cons (format "%s%s" prefix element) value))))))
-(defvar ac-source-rope
-  '((candidates
-     . (lambda ()
-         (prefix-list-elements (rope-completions) ac-target))))
-  "Source for Rope")
-(defun ac-python-find ()
-  "Python `ac-find-function'."
-  (require 'thingatpt)
-  (let ((symbol (car-safe (bounds-of-thing-at-point 'symbol))))
-    (if (null symbol)
-        (if (string= "." (buffer-substring (- (point) 1) (point)))
-            (point)
-          nil)
-      symbol)))
-(defun ac-python-candidate ()
-  "Python `ac-candidates-function'"
+  (setq ropemacs-autoimport-modules '("os" "shutil" "sys" "logging"
+				      "tornado"))
+
+ 
+
+  ;; Adding hook to automatically open a rope project if there is one
+  ;; in the current or in the upper level directory
+   (add-hook 'python-mode-hook
+            (lambda ()
+              (cond ((file-exists-p ".ropeproject")
+                     (rope-open-project default-directory))
+                    ((file-exists-p "../.ropeproject")
+                     (rope-open-project (concat default-directory "..")))
+                    )))
+  )
+
+
+
+;; Python or python mode?
+(eval-after-load 'python
+  '(progn
+     ;;==================================================
+     ;; Ropemacs Configuration
+     ;;==================================================
+     (setup-ropemacs)
+
+     ;;==================================================
+     ;; Virtualenv Commands
+     ;;==================================================
+     ;; (autoload 'virtualenv-activate "virtualenv"
+     ;;   "Activate a Virtual Environment specified by PATH" t)
+     ;; (autoload 'virtualenv-workon "virtualenv"
+     ;;   "Activate a Virtual Environment present using virtualenvwrapper" t)
+     
+     
+     ;; ;; Not on all modes, please
+     ;; ;; Be careful of mumamo, buffer file name nil
+     ;; (add-hook 'python-mode-hook (lambda () (if (buffer-file-name)
+     ;;    					(flymake-mode))))
+
+     ;; ;; when we swich on the command line, switch in Emacs
+     ;; ;;(desktop-save-mode 1)
+     ;; (defun workon-postactivate (virtualenv)
+     ;;   (require 'virtualenv)
+     ;;   (virtualenv-activate virtualenv)
+     ;;   (desktop-change-dir virtualenv))
+     )
+  )
+
+
+;; Live completion with auto-complete
+;; (see http://cx4a.org/software/auto-complete/)
+(require 'auto-complete-config nil t)
+(add-to-list 'ac-dictionary-directories (concat dotfiles-dir "/vendor/auto-complete/dict/"))
+;; Do What I Mean mode
+(setq ac-dwim t)
+(ac-config-default)
+
+;; custom keybindings to use tab, enter and up and down arrows
+(define-key ac-complete-mode-map "\t" 'ac-expand)
+(define-key ac-complete-mode-map "\r" 'ac-complete)
+(define-key ac-complete-mode-map "\M-n" 'ac-next)
+(define-key ac-complete-mode-map "\M-p" 'ac-previous)
+
+
+;; Disabling Yasnippet completion 
+(defun epy-snips-from-table (table)
+  (with-no-warnings
+    (let ((hashtab (ac-yasnippet-table-hash table))
+          (parent (ac-yasnippet-table-parent table))
+          candidates)
+      (maphash (lambda (key value)
+                 (push key candidates))
+               hashtab)
+      (identity candidates)
+      )))
+
+(defun epy-get-all-snips ()
   (let (candidates)
-    (dolist (source ac-sources)
-      (if (symbolp source)
-          (setq source (symbol-value source)))
-      (let* ((ac-limit (or (cdr-safe (assq 'limit source)) ac-limit))
-             (requires (cdr-safe (assq 'requires source)))
-             cand)
-        (if (or (null requires)
-                (>= (length ac-target) requires))
-            (setq cand
-                  (delq nil
-                        (mapcar (lambda (candidate)
-                                  (propertize candidate 'source source))
-                                (funcall (cdr (assq 'candidates source)))))))
-        (if (and (> ac-limit 1)
-                 (> (length cand) ac-limit))
-            (setcdr (nthcdr (1- ac-limit) cand) nil))
-        (setq candidates (append candidates cand))))
-    (delete-dups candidates)))
-(add-hook 'python-mode-hook
-          (lambda ()
-                 (auto-complete-mode 1)
-                 (set (make-local-variable 'ac-sources)
-                      (append ac-sources '(ac-source-rope)))
-                 (set (make-local-variable 'ac-find-function) 'ac-python-find)
-                 (set (make-local-variable 'ac-candidate-function) 'ac-python-candidate)
-                 (set (make-local-variable 'ac-auto-start) nil)))
+    (maphash
+     (lambda (kk vv) (push (epy-snips-from-table vv) candidates)) yas/tables)
+    (apply 'append candidates))
+  )
 
-;;Ryan's python specific tab completion
-  ; Try the following in order:
-  ; 1) Try a yasnippet expansion without autocomplete
-  ; 2) If at the beginning of the line, indent
-  ; 3) If at the end of the line, try to autocomplete
-  ; 4) If the char after point is not alpha-numerical, try autocomplete
-  ; 5) Try to do a regular python indent.
-  ; 6) If at the end of a word, try autocomplete.
-;; (add-hook 'python-mode-hook
-;;           '(lambda ()
-;;              (setq yas/fallback-behavior
-;;                    `(apply ,ryan-python-expand-after-yasnippet))
-;;              (local-set-key [tab] 'yas/expand)))
+;;(setq ac-ignores (concatenate 'list ac-ignores (epy-get-all-snips)))
 
-(define-key python-mode-map [tab] 'ryan-python-expand-after-yasnippet)
-(add-hook 'python-mode-hook
-          (let ((original-command (lookup-key python-mode-map [tab])))
-            `(lambda ()
-               (setq yas/fallback-behavior
-                     '(apply ,original-command))
-               (local-set-key [tab] 'yas/expand))))
+;; ropemacs Integration with auto-completion
+(defun ac-ropemacs-candidates ()
+  (mapcar (lambda (completion)
+      (concat ac-prefix completion))
+    (rope-completions)))
 
-(defun ryan-indent ()
-  "Runs indent-for-tab-command but returns t if it actually did an indent; nil otherwise"
-  (let ((prev-point (point)))
-    (indent-for-tab-command)
-    (if (eql (point) prev-point)
-        nil
-      t)))
-(defun ryan-python-expand-after-yasnippet ()
+(ac-define-source nropemacs
+  '((candidates . ac-ropemacs-candidates)
+    (symbol     . "p")))
+
+(ac-define-source nropemacs-dot
+  '((candidates . ac-ropemacs-candidates)
+    (symbol     . "p")
+    (prefix     . c-dot)
+    (requires   . 0)))
+
+(defun ac-nropemacs-setup ()
+  (setq ac-sources (append '(ac-source-nropemacs
+                             ac-source-nropemacs-dot) ac-sources)))
+(defun ac-python-mode-setup ()
+  (add-to-list 'ac-sources 'ac-source-yasnippet))
+
+(add-hook 'python-mode-hook 'ac-python-mode-setup)
+(add-hook 'rope-open-project-hook 'ac-nropemacs-setup)
+;;; epy-completion.el ends here
+
+
+;; epy-editing.el
+
+;; code borrowed from http://emacs-fu.blogspot.com/2010/01/duplicating-lines-and-commenting-them.html
+(defun djcb-duplicate-line (&optional commentfirst)
+  "comment line at point; if COMMENTFIRST is non-nil, comment the
+original" (interactive)
+  (beginning-of-line)
+  (push-mark)
+  (end-of-line)
+  (let ((str (buffer-substring (region-beginning) (region-end))))
+    (when commentfirst
+    (comment-region (region-beginning) (region-end)))
+    (insert-string
+      (concat (if (= 0 (forward-line 1)) "" "\n") str "\n"))
+    (forward-line -1)))
+
+;; duplicate a line
+(global-set-key (kbd "C-c y") 'djcb-duplicate-line)
+
+;; duplicate a line and comment the first
+(global-set-key (kbd "C-c c")(lambda()(interactive)(djcb-duplicate-line t)))
+
+;; Mark whole line
+(defun mark-line (&optional arg)
+  "Marks a line"
+  (interactive "p")
+  (beginning-of-line)
+  (push-mark (point) nil t)
+  (end-of-line))
+
+(global-set-key (kbd "C-c l") 'mark-line)
+
+
+; code copied from http://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
+(defun move-text-internal (arg)
+  (cond
+   ((and mark-active transient-mark-mode)
+    (if (> (point) (mark))
+        (exchange-point-and-mark))
+    (let ((column (current-column))
+          (text (delete-and-extract-region (point) (mark))))
+      (forward-line arg)
+      (move-to-column column t)
+      (set-mark (point))
+      (insert text)
+      (exchange-point-and-mark)
+      (setq deactivate-mark nil)))
+   (t
+    (let ((column (current-column)))
+      (beginning-of-line)
+      (when (or (> arg 0) (not (bobp)))
+        (forward-line)
+        (when (or (< arg 0) (not (eobp)))
+          (transpose-lines arg))
+        (forward-line -1))
+      (move-to-column column t)))))
+
+(defun move-text-down (arg)
+  "Move region (transient-mark-mode active) or current line
+  arg lines down."
+  (interactive "*p")
+  (move-text-internal arg))
+
+(defun move-text-up (arg)
+  "Move region (transient-mark-mode active) or current line
+  arg lines up."
+  (interactive "*p")
+  (move-text-internal (- arg)))
+
+; patches by balle
+; http://www.datenterrorist.de
+(defun balle-python-shift-left ()
   (interactive)
-  ;;2) Try indent at beginning of the line
-  (let ((prev-point (point))
-        (beginning-of-line nil))
-    (save-excursion
-      (move-beginning-of-line nil)
-      (if (eql 0 (string-match "\\W*$" (buffer-substring (point) prev-point)))
-          (setq beginning-of-line t)))
-    (if beginning-of-line
-        (ryan-indent)))
-  ;;3) Try autocomplete if at the end of a line, or
-  ;;4) Try autocomplete if the next char is not alpha-numerical
-  (if (or (string-match "\n" (buffer-substring (point) (+ (point) 1)))
-          (not (string-match "[a-zA-Z0-9]" (buffer-substring (point) (+ (point) 1)))))
-      (ac-start)
-    ;;5) Try a regular indent
-    (if (not (ryan-indent))
-        ;;6) Try autocomplete at the end of a word
-        (if (string-match "\\W" (buffer-substring (point) (+ (point) 1)))
-            (ac-start)))))
+  (let (start end bds)
+    (if (and transient-mark-mode
+	   mark-active)
+	(setq start (region-beginning) end (region-end))
+      (progn
+	(setq bds (bounds-of-thing-at-point 'line))
+	(setq start (car bds) end (cdr bds))))
+  (python-indent-shift-left start end))
+  (setq deactivate-mark nil)
+)
 
-;; End Tab completion
+(defun balle-python-shift-right ()
+  (interactive)
+  (let (start end bds)
+    (if (and transient-mark-mode
+	   mark-active)
+	(setq start (region-beginning) end (region-end))
+      (progn
+	(setq bds (bounds-of-thing-at-point 'line))
+	(setq start (car bds) end (cdr bds))))
+  (python-indent-shift-right start end))
+  (setq deactivate-mark nil)
+)
 
+(global-set-key (kbd "M-<up>") 'move-text-up)
+(global-set-key (kbd "M-<down>") 'move-text-down)
 
-;;Workaround so that Autocomplete is by default is only invoked explicitly,
-;;but still automatically updates as you type while attempting to complete.
-(defadvice ac-start (before advice-turn-on-auto-start activate)
-  (set (make-local-variable 'ac-auto-start) t))
-(defadvice ac-cleanup (after advice-turn-off-auto-start activate)
-  (set (make-local-variable 'ac-auto-start) nil))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; End Auto Completion
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Flymake with Pyflakes
-;; Disabling for now, it's really quite buggy.
-
-;; (require 'flymake)
-;; (load-library "flymake-cursor")
-;; (when (load "flymake" t)
-;; (defun flymake-pyflakes-init ()
-;; (let* ((temp-file (flymake-init-create-temp-buffer-copy
-;; 'flymake-create-temp-inplace))
-;; (local-file (file-relative-name
-;; temp-file
-;; (file-name-directory buffer-file-name))))
-;; (list "pyflakes" (list local-file))))
-;; (add-to-list 'flymake-allowed-file-name-masks
-;; '("\\.py\\'" flymake-pyflakes-init)))
-;; (add-hook 'find-file-hook 'flymake-find-file-hook)
-;; (custom-set-faces
-;; '(flymake-errline ((((class color)) (:background "DarkRed"))))
-;; '(flymake-warnline ((((class color)) (:background "DarkBlue")))))
-
-
-;;Autofill comments
-;;TODO: make this work for docstrings too.
-;; but docstrings just use font-lock-string-face unfortunately
 (add-hook 'python-mode-hook
-          (lambda ()
-            (auto-fill-mode 1)
-            (set (make-local-variable 'fill-nobreak-predicate)
-                 (lambda ()
-                   (not (eq (get-text-property (point) 'face)
-                            'font-lock-comment-face))))))
+	  (lambda ()
+	    (define-key python-mode-map (kbd "M-<right>")
+	      'balle-python-shift-right)
+	    (define-key python-mode-map (kbd "M-<left>")
+	      'balle-python-shift-left))
+	  )
 
-;; (brm-init)
-;; (require 'pycomplete)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; UNUSED?
-;; Put the following in your .emacs so that the
-;; abbrev table is set correctly in all modes.
-;; (Not just for java)
-;;
-;; (add-hook 'pre-abbrev-expand-hook 'abbrev-table-change)
-;; (defun abbrev-table-change (&optional args)
-;; (setq local-abbrev-table
-;; (if (eq major-mode 'jde-mode)
-;; (if (jde-parse-comment-or-quoted-p)
-;; text-mode-abbrev-table
-;; java-mode-abbrev-table)
-;; (if (eq major-mode 'python-mode)
-;; (if (inside-comment-p)
-;; text-mode-abbrev-table
-;; python-mode-abbrev-table
-;; ))))
-;; )
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; end epy-editing.el

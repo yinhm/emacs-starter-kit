@@ -33,12 +33,12 @@
   (setq mac-option-modifier 'alt)
   (setq mac-command-modifier 'meta)
   (global-set-key [kp-delete] 'delete-char) ;; sets fn-delete to be right-delete
-  )
 
-;; Macports execute path
-;;(add-to-list 'exec-path "/opt/local/bin")
-(setq exec-path (cons "/opt/local/bin" exec-path))
-(setenv "PATH" (concat "/opt/local/bin:" (getenv "PATH")))
+  ;; Macports execute path
+  ;;(add-to-list 'exec-path "/opt/local/bin")
+  (setq exec-path (cons "/opt/local/bin" exec-path))
+  (setenv "PATH" (concat "/opt/local/bin:" (getenv "PATH")))
+  )
 
 
 ;; ispell dict

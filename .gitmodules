@@ -1,6 +1,3 @@
 [submodule "vendor/auto-complete"]
 	path = vendor/auto-complete
 	url = https://github.com/auto-complete/auto-complete
-[submodule "vendor/yaml-mode"]
-	path = vendor/yaml-mode
-	url = https://github.com/yoshiki/yaml-mode.git

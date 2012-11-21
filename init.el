@@ -69,7 +69,7 @@
 ;; kit-run-directoties
 ;; Pull in split configuration
 (load (concat dotfiles-dir "vendor/kit-startup.el"))
-(kit-run-directories)
+;; (kit-run-directories)
 (kit-run-directories (concat dotfiles-dir "/init.d"))
 
 (load custom-file 'noerror)

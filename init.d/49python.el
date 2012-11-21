@@ -2,11 +2,13 @@
 ;; https://launchpad.net/python-mode/
 
 
-(setq py-install-directory (concat dotfiles-dir "/vendor/python-mode"))
-(add-to-list 'load-path py-install-directory)
+;;(setq py-install-directory (concat dotfiles-dir "/vendor/python-mode"))
+;;(add-to-list 'load-path py-install-directory)
 
-(autoload 'python-mode "python-mode" "Python Mode." t)
+;;(autoload 'python-mode "python-mode" "Python Mode." t)
 
+;; fgallina version of python mode.
+(require 'python)
 
 (setq py-shell-name "ipython")
 
@@ -20,7 +22,7 @@
                 (set-variable 'py-smart-indentation nil)
                 (set-variable 'indent-tabs-mode nil)
                 ;;(highlight-beyond-fill-column)
-                (define-key python-mode-map "\C-o" 'newline-and-indent)
+                (define-key python-mode-map "\C-m" 'newline-and-indent)
                 )
          )
       )
@@ -192,6 +194,63 @@
 ;;; epy-completion.el ends here
 
 
+
+;; Ryan's python specific tab completion
+  ; Try the following in order:
+  ; 1) Try a yasnippet expansion without autocomplete
+  ; 2) If at the beginning of the line, indent
+  ; 3) If at the end of the line, try to autocomplete
+  ; 4) If the char after point is not alpha-numerical, try autocomplete
+  ; 5) Try to do a regular python indent.
+  ; 6) If at the end of a word, try autocomplete.
+;; (add-hook 'python-mode-hook
+;;           '(lambda ()
+;;              (setq yas/fallback-behavior
+;;                    `(apply ,ryan-python-expand-after-yasnippet))
+;;              (local-set-key [tab] 'yas/expand)))
+
+
+
+(define-key python-mode-map [tab] 'ryan-python-expand-after-yasnippet)
+(add-hook 'python-mode-hook
+          (let ((original-command (lookup-key python-mode-map [tab])))
+            `(lambda ()
+               (setq yas/fallback-behavior
+                     '(apply ,original-command))
+               (local-set-key [tab] 'yas/expand))))
+
+(defun ryan-indent ()
+  "Runs indent-for-tab-command but returns t if it actually did an indent; nil otherwise"
+  (let ((prev-point (point)))
+    (indent-for-tab-command)
+    (if (eql (point) prev-point)
+        nil
+      t)))
+(defun ryan-python-expand-after-yasnippet ()
+  (interactive)
+  ;;2) Try indent at beginning of the line
+  (let ((prev-point (point))
+        (beginning-of-line nil))
+    (save-excursion
+      (move-beginning-of-line nil)
+      (if (eql 0 (string-match "\\W*$" (buffer-substring (point) prev-point)))
+          (setq beginning-of-line t)))
+    (if beginning-of-line
+        (ryan-indent)))
+  ;;3) Try autocomplete if at the end of a line, or
+  ;;4) Try autocomplete if the next char is not alpha-numerical
+  (if (or (string-match "\n" (buffer-substring (point) (+ (point) 1)))
+          (not (string-match "[a-zA-Z0-9]" (buffer-substring (point) (+ (point) 1)))))
+      (ac-start)
+    ;;5) Try a regular indent
+    (if (not (ryan-indent))
+        ;;6) Try autocomplete at the end of a word
+        (if (string-match "\\W" (buffer-substring (point) (+ (point) 1)))
+            (ac-start)))))
+
+;; End Tab completion
+
+
 ;; epy-editing.el
 
 ;; code borrowed from http://emacs-fu.blogspot.com/2010/01/duplicating-lines-and-commenting-them.html
@@ -223,81 +282,5 @@ original" (interactive)
   (end-of-line))
 
 (global-set-key (kbd "C-c l") 'mark-line)
-
-
-; code copied from http://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
-(defun move-text-internal (arg)
-  (cond
-   ((and mark-active transient-mark-mode)
-    (if (> (point) (mark))
-        (exchange-point-and-mark))
-    (let ((column (current-column))
-          (text (delete-and-extract-region (point) (mark))))
-      (forward-line arg)
-      (move-to-column column t)
-      (set-mark (point))
-      (insert text)
-      (exchange-point-and-mark)
-      (setq deactivate-mark nil)))
-   (t
-    (let ((column (current-column)))
-      (beginning-of-line)
-      (when (or (> arg 0) (not (bobp)))
-        (forward-line)
-        (when (or (< arg 0) (not (eobp)))
-          (transpose-lines arg))
-        (forward-line -1))
-      (move-to-column column t)))))
-
-(defun move-text-down (arg)
-  "Move region (transient-mark-mode active) or current line
-  arg lines down."
-  (interactive "*p")
-  (move-text-internal arg))
-
-(defun move-text-up (arg)
-  "Move region (transient-mark-mode active) or current line
-  arg lines up."
-  (interactive "*p")
-  (move-text-internal (- arg)))
-
-; patches by balle
-; http://www.datenterrorist.de
-(defun balle-python-shift-left ()
-  (interactive)
-  (let (start end bds)
-    (if (and transient-mark-mode
-	   mark-active)
-	(setq start (region-beginning) end (region-end))
-      (progn
-	(setq bds (bounds-of-thing-at-point 'line))
-	(setq start (car bds) end (cdr bds))))
-  (python-indent-shift-left start end))
-  (setq deactivate-mark nil)
-)
-
-(defun balle-python-shift-right ()
-  (interactive)
-  (let (start end bds)
-    (if (and transient-mark-mode
-	   mark-active)
-	(setq start (region-beginning) end (region-end))
-      (progn
-	(setq bds (bounds-of-thing-at-point 'line))
-	(setq start (car bds) end (cdr bds))))
-  (python-indent-shift-right start end))
-  (setq deactivate-mark nil)
-)
-
-(global-set-key (kbd "M-<up>") 'move-text-up)
-(global-set-key (kbd "M-<down>") 'move-text-down)
-
-(add-hook 'python-mode-hook
-	  (lambda ()
-	    (define-key python-mode-map (kbd "M-<right>")
-	      'balle-python-shift-right)
-	    (define-key python-mode-map (kbd "M-<left>")
-	      'balle-python-shift-left))
-	  )
 
 ;;; end epy-editing.el

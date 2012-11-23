@@ -8,6 +8,8 @@
 (setq fill-column 79)
 (setq-default auto-fill-function 'do-auto-fill)
 
+(setq tab-width 4)
+
 ;; color theme
 (require 'color-theme-textmate2)
 (color-theme-textmate2)
@@ -47,6 +49,7 @@
   (setq mac-option-modifier 'alt)
   (setq mac-command-modifier 'meta)
   (global-set-key [kp-delete] 'delete-char) ;; sets fn-delete to be right-delete
+  (global-set-key (kbd "M-RET") 'ns-toggle-fullscreen)
 
   ;; Macports execute path
   ;;(add-to-list 'exec-path "/opt/local/bin")

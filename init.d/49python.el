@@ -13,20 +13,17 @@
 (setq py-shell-name "ipython")
 
 
-(setq interpreter-mode-alist
-      (cons '("python" . python-mode)
-            interpreter-mode-alist)
-      python-mode-hook
-      '(lambda () (progn
-                (set-variable 'py-indent-offset 4)
-                (set-variable 'py-smart-indentation nil)
-                (set-variable 'indent-tabs-mode nil)
-                ;;(highlight-beyond-fill-column)
-                (define-key python-mode-map "\C-m" 'newline-and-indent)
-                )
-         )
-      )
 
+(add-hook 'python-mode-hook
+          (lambda ()
+            (setq tab-width 4)
+            (set-variable 'python-indent-offset 4)
+            (set-variable 'python-indent-guess-indent-offset nil)
+            (set-variable 'python-smart-indentation nil)
+            (set-variable 'indent-tabs-mode nil)
+            ;;(highlight-beyond-fill-column)
+            (define-key python-mode-map "\C-m" 'newline-and-indent)
+            ))
 
 ;; Cython support
 (require 'cython-mode)

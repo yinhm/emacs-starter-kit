@@ -60,6 +60,6 @@
 
   ;; ispell dict
   ;; port install aspell first
-  (setq-default ispell-program-name "aspell")
-  (ispell-change-dictionary "english" t)
+  ;;(setq-default ispell-program-name "aspell")
+  ;;(ispell-change-dictionary "english" t)
   )

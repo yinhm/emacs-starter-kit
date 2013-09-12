@@ -26,3 +26,4 @@ eproject.lst
 tutorial/*
 history
 *pyc
+.emacs.desktop*

@@ -29,3 +29,14 @@
                       charset
                       (font-spec :family "Hiragino Sans GB")))
   )
+
+(when (eq system-type 'windows-nt)
+  ;; English fonts
+  (set-frame-font "Consolas-14")
+  
+  ;; Chinese fonts
+  (dolist (charset '(kana han symbol cjk-misc bopomofo))
+    (set-fontset-font (frame-parameter nil 'font)
+                      'han
+                      '("Microsoft Yahei" . "unicode-bmp")))
+  )

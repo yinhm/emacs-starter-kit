@@ -1,4 +1,4 @@
-
+'
 (load "desktop") 
 (desktop-save-mode 1)
 ;; (require 'tabbar)
@@ -49,7 +49,11 @@
   (setq mac-option-modifier 'alt)
   (setq mac-command-modifier 'meta)
   (global-set-key [kp-delete] 'delete-char) ;; sets fn-delete to be right-delete
-  (global-set-key (kbd "M-RET") 'ns-toggle-fullscreen)
+
+  (custom-set-variables
+   '(initial-frame-alist (quote ((fullscreen . maximized)))))
+
+  (global-set-key (kbd "M-RET") 'toggle-fullscreen)
 
   ;; Macports execute path
   ;;(add-to-list 'exec-path "/opt/local/bin")

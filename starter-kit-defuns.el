@@ -251,14 +251,14 @@ Symbols matching the text at point are put first in the completion list."
     (setenv "SSH_AUTH_SOCK" agent)
     (message agent)))
 
-(defun toggle-fullscreen ()
+(defun toggle-fullscreen (&optional f)
   (interactive)
-  ;; TODO: this only works for X. patches welcome for other OSes.
-  (x-send-client-message nil 0 nil "_NET_WM_STATE" 32
-                         '(2 "_NET_WM_STATE_MAXIMIZED_VERT" 0))
-  (x-send-client-message nil 0 nil "_NET_WM_STATE" 32
-                         '(2 "_NET_WM_STATE_MAXIMIZED_HORZ" 0)))
-
+  (let ((current-value (frame-parameter nil 'fullscreen)))
+    (set-frame-parameter nil 'fullscreen
+                         (if (equal 'fullboth current-value)
+                             (if (boundp 'old-fullscreen) old-fullscreen nil)
+                           (progn (setq old-fullscreen current-value)
+                                  'fullboth)))))
 
 ;; A monkeypatch to cause annotate to ignore whitespace
 (defun vc-git-annotate-command (file buf &optional rev)

@@ -54,14 +54,6 @@
 ;; (require 'dart-mode)
 
 
-;; ===============================================================
-;; DotNet
-;; (require 'csharp-mode)
-;; (setq auto-mode-alist
-;;       (append '(("\\.cs$" . csharp-mode)) auto-mode-alist))
-
-
-
 
 ;; ===============================================================
 ;; Scala
@@ -81,3 +73,10 @@
 ;; scss
 ;; (autoload 'scss-mode "scss-mode")
 ;; (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+
+
+;; ===============================================================
+;; dot
+;; (Load-file "PATH_TO_FILE/graphviz-dot-mode.el") 
+(require 'graphviz-dot-mode)
+(setq graphviz-dot-indent-width 4)

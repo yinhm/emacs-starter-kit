@@ -16,7 +16,7 @@
 (require 'go-autocomplete)
 ;; speedbar
 ;; (speedbar 1)
-(speedbar-add-supported-extension ".go")
+;; (speedbar-add-supported-extension ".go")
 (add-hook
  'go-mode-hook
  '(lambda ()

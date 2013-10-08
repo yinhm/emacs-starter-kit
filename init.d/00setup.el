@@ -50,9 +50,6 @@
   (setq mac-command-modifier 'meta)
   (global-set-key [kp-delete] 'delete-char) ;; sets fn-delete to be right-delete
 
-  (custom-set-variables
-   '(initial-frame-alist (quote ((fullscreen . maximized)))))
-
   (global-set-key (kbd "M-RET") 'toggle-fullscreen)
 
   ;; Macports execute path

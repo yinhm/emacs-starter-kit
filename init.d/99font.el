@@ -5,17 +5,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Linux specific
 (when (eq system-type 'gnu/linux)
-  (add-to-list 'default-frame-alist '(font . "Monaco-10"))
+  (add-to-list 'default-frame-alist '(font . "Monaco-12"))
 
-  (set-frame-font "Monaco-10")
+  (set-frame-font "Monaco-12")
   (set-fontset-font (frame-parameter nil 'font)
                     'unicode
-                    '("DejaVu Sans Mono-10" . "unicode-bmp"))
+                    '("DejaVu Sans Mono-12" . "unicode-bmp"))
   (set-fontset-font (frame-parameter nil 'font)
                     'han '("Microsoft YaHei" . "unicode-bmp"))
-  (set-fontset-font (frame-parameter nil 'font)
-                    'han
-                    '("SimSun" . "unicode-bmp"))
   )
 
 ;; MacOS X specific

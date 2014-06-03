@@ -8,11 +8,16 @@
   (add-to-list 'default-frame-alist '(font . "Monaco-12"))
 
   (set-frame-font "Monaco-12")
+  ;; (set-frame-font "Ubuntu Mono-13")
+
+  (set-fontset-font (frame-parameter nil 'font)
+                    'han '("Microsoft YaHei" . "unicode-bmp"))
   (set-fontset-font (frame-parameter nil 'font)
                     'unicode
                     '("DejaVu Sans Mono-12" . "unicode-bmp"))
   (set-fontset-font (frame-parameter nil 'font)
-                    'han '("Microsoft YaHei" . "unicode-bmp"))
+                    'han '("WenQuanYi Micro Hei" . "unicode-bmp"))
+
   )
 
 ;; MacOS X specific

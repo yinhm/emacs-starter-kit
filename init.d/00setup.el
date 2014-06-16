@@ -5,10 +5,11 @@
 ;; (tabbar-mode)
 
 ;; auto fill
-(setq fill-column 79)
+(setq default-fill-column 79)
 (setq-default auto-fill-function 'do-auto-fill)
 
 (setq tab-width 4)
+(setq column-number-mode t)
 
 ;; color theme
 (require 'color-theme-textmate2)

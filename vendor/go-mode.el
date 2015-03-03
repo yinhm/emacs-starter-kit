@@ -220,21 +220,6 @@ a `before-save-hook'."
   :type '(repeat (list regexp (choice (repeat string) function)))
   :group 'go)
 
-(defun go--kill-new-message (url)
-  "Make URL the latest kill and print a message."
-  (kill-new url)
-  (message "%s" url))
-
-(defcustom go-play-browse-function 'go--kill-new-message
-  "Function to call with the Playground URL.
-See `go-play-region' for more details."
-  :type '(choice
-          (const :tag "Nothing" nil)
-          (const :tag "Kill + Message" go--kill-new-message)
-          (const :tag "Browse URL" browse-url)
-          (function :tag "Call function"))
-  :group 'go)
-
 (defcustom go-coverage-display-buffer-func 'display-buffer-reuse-window
   "How `go-coverage' should display the coverage buffer.
 See `display-buffer' for a list of possible functions."
@@ -378,27 +363,6 @@ For mode=set, all covered lines will have this weight."
     (define-key m (kbd "C-c C-d") #'godef-describe)
     m)
   "Keymap used by Go mode to implement electric keys.")
-
-(easy-menu-define go-mode-menu go-mode-map
-  "Menu for Go mode."
-  '("Go"
-    ["Describe Expression"   godef-describe t]
-    ["Jump to Definition"    godef-jump t]
-    "---"
-    ["Add Import"            go-import-add t]
-    ["Remove Unused Imports" go-remove-unused-imports t]
-    ["Go to Imports"         go-goto-imports t]
-    "---"
-    ("Playground"
-     ["Send Buffer"          go-play-buffer t]
-     ["Send Region"          go-play-region t]
-     ["Download"             go-download-play t])
-    "---"
-    ["Coverage"              go-coverage t]
-    ["Gofmt"                 gofmt t]
-    ["Godoc"                 godoc t]
-    "---"
-    ["Customize Mode"        (customize-group 'go) t]))
 
 (defun go-mode-insert-and-indent (key)
   "Invoke the global binding of KEY, then reindent the line."
@@ -1164,9 +1128,8 @@ declaration."
   (go-play-region (point-min) (point-max)))
 
 (defun go-play-region (start end)
-  "Send the region to the Playground.
-If non-nil `go-play-browse-function' is called with the
-Playground URL."
+  "Send the region to the Playground and stores the resulting
+link in the kill ring."
   (interactive "r")
   (let* ((url-request-method "POST")
          (url-request-extra-headers
@@ -1183,10 +1146,8 @@ Playground URL."
                            (signal 'go-play-error (cdr arg)))
                           (t
                            (re-search-forward "\n\n")
-                           (let ((url (format "http://play.golang.org/p/%s"
-                                              (buffer-substring (point) (point-max)))))
-                             (when go-play-browse-function
-                               (funcall go-play-browse-function url)))))))))))
+                           (kill-new (format "http://play.golang.org/p/%s" (buffer-substring (point) (point-max))))
+                           (message "http://play.golang.org/p/%s" (buffer-substring (point) (point-max)))))))))))
 
 ;;;###autoload
 (defun go-download-play (url)

@@ -1,101 +1,19 @@
+;; golang mode
+;;
 ;; Gocode
 ;; go get -u github.com/nsf/gocode
-;; ;;
-;; ~ cd $GOPATH/src/github.com/nsf/gocode/emacs
-;; ~ cp go-autocomplete.el ~/.emacs.d/
-;; ~ gocode set propose-builtins true
-;; propose-builtins true
-;; ~ gocode set lib-path "/home/border/gocode/pkg/linux_amd64" // 换为你自己的路径
-;; lib-path "/home/border/gocode/pkg/linux_amd64"
-;; ~ gocode set
-;; propose-builtins true
-;; lib-path "/home/border/gocode/pkg/linux_amd64"
+;; 
+;; See https://github.com/nsf/gocode for usage
 
-;; golang mode
-(require 'go-mode-load)
+;; go get golang.org/x/tools/cmd/goimports
+(setq gofmt-command "/home/yinhm/gopath/bin/goimports")
+
+(require 'go-mode-autoloads)
 (require 'go-autocomplete)
-;; speedbar
-;; (speedbar 1)
-;; (speedbar-add-supported-extension ".go")
-(add-hook
- 'go-mode-hook
- '(lambda ()
-    ;; gocode
-    (auto-complete-mode 1)
-    (setq ac-sources '(ac-source-go))
-    ;; Imenu & Speedbar
-    (setq imenu-generic-expression
-          '(("type" "^type *\\([^ \t\n\r\f]*\\)" 1)
-            ("func" "^func *\\(.*\\) {" 1)))
-    (imenu-add-to-menubar "Index")
-    ;; Outline mode
-    (make-local-variable 'outline-regexp)
-    (setq outline-regexp "//\\.\\|//[^\r\n\f][^\r\n\f]\\|pack\\|func\\|impo\\|cons\\|var.\\|type\\|\t\t*....")
-    (outline-minor-mode 1)
-    (local-set-key "\M-a" 'outline-previous-visible-heading)
-    (local-set-key "\M-e" 'outline-next-visible-heading)
-    ;; auto complete
-    (local-set-key (kbd "M-/") 'semantic-complete-analyze-inline)
-    (local-set-key "." 'semantic-complete-self-insert)
-    (local-set-key ">" 'semantic-complete-self-insert)
-    ;; Menu bar
-    (require 'easymenu)
-    (defconst go-hooked-menu
-      '("Go tools"
-        ["Go run buffer" go t]
-        ["Go reformat buffer" go-fmt-buffer t]
-        ["Go check buffer" go-fix-buffer t]))
-    (easy-menu-define
-      go-added-menu
-      (current-local-map)
-      "Go tools"
-      go-hooked-menu)
+(require 'auto-complete-config)
 
-    ;; Other
-    (setq show-trailing-whitespace t)
-    ))
-;; helper function
-(defun go ()
-  "run current buffer"
-  (interactive)
-  (compile (concat "go run " (buffer-file-name))))
-
-;; helper function
-(defun go-fmt-buffer ()
-  "run gofmt on current buffer"
-  (interactive)
-  (if buffer-read-only
-      (progn
-        (ding)
-        (message "Buffer is read only"))
-    (let ((p (line-number-at-pos))
-          (filename (buffer-file-name))
-          (old-max-mini-window-height max-mini-window-height))
-      (show-all)
-      (if (get-buffer "*Go Reformat Errors*")
-          (progn
-            (delete-windows-on "*Go Reformat Errors*")
-            (kill-buffer "*Go Reformat Errors*")))
-      (setq max-mini-window-height 1)
-      (if (= 0 (shell-command-on-region (point-min) (point-max) "gofmt" "*Go Reformat Output*" nil "*Go Reformat Errors*" t))
-          (progn
-            (erase-buffer)
-            (insert-buffer-substring "*Go Reformat Output*")
-            (goto-char (point-min))
-            (forward-line (1- p)))
-        (with-current-buffer "*Go Reformat Errors*"
-          (progn
-            (goto-char (point-min))
-            (while (re-search-forward "<standard input>" nil t)
-              (replace-match filename))
-            (goto-char (point-min))
-            (compilation-mode))))
-      (setq max-mini-window-height old-max-mini-window-height)
-      (delete-windows-on "*Go Reformat Output*")
-      (kill-buffer "*Go Reformat Output*"))))
-;; helper function
-(defun go-fix-buffer ()
-  "run gofix on current buffer"
-  (interactive)
-  (show-all)
-  (shell-command-on-region (point-min) (point-max) "go tool fix -diff"))
+(add-hook 'go-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook 'gofmt-before-save)
+            (setq tab-width 4)
+            (setq indent-tabs-mode nil)))

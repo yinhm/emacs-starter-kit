@@ -29,6 +29,11 @@
 (setq make-backup-files nil)
 
 
+(defun myindent-ess-hook () 
+  (setq ess-indent-level 2)) 
+
+(add-hook 'ess-mode-hook 'myindent-ess-hook) 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Platform
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

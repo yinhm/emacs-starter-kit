@@ -69,7 +69,7 @@
 (global-set-key (kbd "C-c p") 'message-point)
 
 ;; So good!
-(global-set-key (kbd "C-x g") 'magit-status)
+;; (global-set-key (kbd "C-x g") 'magit-status)
 
 (global-set-key (kbd "C-c q") 'join-line)
 

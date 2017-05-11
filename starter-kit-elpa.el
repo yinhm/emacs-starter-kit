@@ -9,7 +9,6 @@
                                    'inf-ruby
                                    'css-mode
                                    'find-file-in-project
-                                   'magit
                                    'textmate
                                    'eproject)
   "Libraries that should be installed by default.")

@@ -9,8 +9,7 @@
                                    'inf-ruby
                                    'css-mode
                                    'find-file-in-project
-                                   'textmate
-                                   'eproject)
+                                   'textmate)
   "Libraries that should be installed by default.")
 
 (defun starter-kit-elpa-install ()
